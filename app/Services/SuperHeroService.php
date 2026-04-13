@@ -35,7 +35,7 @@ class SuperHeroService implements SuperHeroInterface
         try {
             $baseUrl = self::API_URL . config('services.superhero.key');
             $client = new Client();
-            $fetchUrl = $baseUrl."/search/" . urlencode($name);
+            $fetchUrl = $baseUrl."/search/" . $name;
             $request = $client->get($fetchUrl);
             if($request->getStatusCode()!==200){
                 throw new \Exception("Error requesting data from API");

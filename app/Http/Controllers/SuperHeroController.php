@@ -19,8 +19,11 @@ class SuperHeroController extends Controller
      */
     public function index(Request $request): View
     {
-        $superHeroes = SuperHeroService::search($request->input('search',"batman"));
-        dd($superHeroes);
+        $superHeroes = collect([]);
+        if($request->filled('search')){
+            $searchEncoded = urlencode($request->input('search'));
+            $superHeroes = SuperHeroService::search($searchEncoded);
+        }
         return view('super-heroes.index',compact('superHeroes'));
     }
 
