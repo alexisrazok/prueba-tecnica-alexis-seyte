@@ -10,26 +10,18 @@ use Illuminate\View\View;
 
 class SuperHeroController extends Controller
 {
-    /**
-     * @return View
-     *
-     * Show the Super Hero Index view
-     */
-    public function index() : View
-    {
-        return view('super-heroes.index');
-    }
 
     /**
      * @param Request $request
-     * @return JsonResponse
+     * @return View
      *
      * Return the retrieved Super Heroes matching a name query
      */
-    public function search(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $superHeroes = SuperHeroService::search($request);
-        return response()->json($superHeroes);
+        $superHeroes = SuperHeroService::search($request->input('search',"batman"));
+        dd($superHeroes);
+        return view('super-heroes.index',compact('superHeroes'));
     }
 
     /**

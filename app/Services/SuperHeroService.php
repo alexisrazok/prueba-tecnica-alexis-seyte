@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\SuperHeroInterface;
 use App\Models\SuperHero;
 use Illuminate\Support\Collection;
+use GuzzleHttp\Client;
 
 class SuperHeroService implements SuperHeroInterface
 {
@@ -16,7 +17,7 @@ class SuperHeroService implements SuperHeroInterface
      *
      * Get a Super Hero by existing SuperHero ID
      */
-    function findById(int $id):SuperHero
+    public static function findById(int $id):SuperHero
     {
 
 
@@ -29,8 +30,26 @@ class SuperHeroService implements SuperHeroInterface
      * Get a Super Hero Collection matching with $name
      */
 
-    function search(string $name): Collection
+    public static function search(string $name): Collection
     {
-
+        try {
+            $baseUrl = self::API_URL . config('services.superhero.key');
+            $client = new Client();
+            $fetchUrl = $baseUrl."/search/" . urlencode($name);
+            $request = $client->get($fetchUrl);
+            if($request->getStatusCode()!==200){
+                throw new \Exception("Error requesting data from API");
+            }
+            $response = $request->getBody();
+            $responseContent = $response->getContents();
+            $responseJson = json_decode($responseContent);
+            if($responseJson->response!=="success"){
+                throw new \Exception("Error getting response from API");
+            }
+            $results = $responseJson->results;
+            return collect($results);
+        }catch(\Exception $exception){
+            throw new \Exception($exception->getMessage());
+        }
     }
 }

@@ -4,6 +4,6 @@ namespace App\Interfaces;
 
 interface SuperHeroInterface
 {
-    function findById(int $id);
-    function search(string $name);
+    public static function findById(int $id);
+    public static function search(string $name);
 }
