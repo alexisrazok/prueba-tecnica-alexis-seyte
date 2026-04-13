@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SuperHero;
+use App\Http\Requests\SuperHeroSearchFormRequest;
 use App\Services\SuperHeroService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,12 +17,11 @@ class SuperHeroController extends Controller
      *
      * Return the retrieved Super Heroes matching a name query
      */
-    public function index(Request $request): View
+    public function index(SuperHeroSearchFormRequest $request): View
     {
-        $superHeroes = collect([]);
+        $superHeroes = null;
         if($request->filled('search')){
-            $searchEncoded = urlencode($request->input('search'));
-            $superHeroes = SuperHeroService::search($searchEncoded);
+            $superHeroes = SuperHeroService::search($request->input('search'));
         }
         return view('super-heroes.index',compact('superHeroes'));
     }
@@ -33,9 +32,9 @@ class SuperHeroController extends Controller
      *
      * Return the retrieved existing Super Hero by ID
      */
-    public function show(Request $request)
+    public function show(int $id)
     {
-        $superHero = SuperHeroService::findById($request->param('id',null));
+        $superHero = SuperHeroService::findById($id);
         return response()->json($superHero);
     }
 }
