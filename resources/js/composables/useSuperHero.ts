@@ -40,9 +40,18 @@ export function useSuperHero() {
 
         try {
             const { data } = await api.get<SuperHero>(`/super-hero/${id}`)
-            hero.value = data
+            if(Object.keys(data).length === 0){
+                error.value = 'Hero not found'
+            }else{
+                hero.value = data
+            }
+            console.log("HERO",hero.value);
         } catch (e) {
-            error.value = 'Hero not found'
+            if (isAxiosError(e) && e.response?.status === 404) {
+                error.value = 'Hero not found'
+            }else{
+                error.value = 'Error fetching hero'
+            }
         } finally {
             loading.value = false
         }

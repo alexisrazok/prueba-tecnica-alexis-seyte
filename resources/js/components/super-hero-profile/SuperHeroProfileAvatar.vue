@@ -7,7 +7,7 @@ const FALLBACK_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
 
 interface Props {
     loading?: boolean,
-    imageUrl?: string,
+    imageUrl?: string | null,
     title?: string,
     class?: HTMLAttributes['class'];
 }
