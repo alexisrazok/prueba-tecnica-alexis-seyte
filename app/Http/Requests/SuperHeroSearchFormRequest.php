@@ -24,7 +24,7 @@ class SuperHeroSearchFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => 'required|string|regex:/[a-zA-Z0-9 -]/'
+            'search' => ['required', 'string', 'regex:/^[a-zA-Z0-9 \-]+$/']
         ];
     }
 

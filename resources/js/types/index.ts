@@ -48,3 +48,8 @@ export interface SuperHero {
     connections?: Connections
     imageUrl?: string | null
 }
+
+export interface ApiValidationError {
+    message: string
+    errors: Record<string, string[]>
+}

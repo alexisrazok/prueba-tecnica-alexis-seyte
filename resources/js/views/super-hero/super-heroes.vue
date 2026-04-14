@@ -5,24 +5,29 @@ import {FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import SuperHeroList from "@/components/super-hero-list/SuperHeroList.vue";
-import {Search} from "lucide-vue-next";
+import {Search, Loader2} from "lucide-vue-next";
 import type {SuperHero} from "@/types";
+import {ref} from "vue";
+import {useSuperHero} from "@/composables/useSuperHero";
+import SuperHeroListSkeleton from "@/components/super-hero-list/SuperHeroListSkeleton.vue";
 
 interface SearchForm {
     search: string;
 }
-const { handleSubmit,values } = useForm<SearchForm>({
+const { handleSubmit } = useForm<SearchForm>({
     initialValues: {
         search: '',
     }
 });
-const submitSearch = handleSubmit(values => {
-    nameSearch = values.search;
-    heroes = [];
-});
 
-let nameSearch: string | null = null;
-let heroes: SuperHero[] = [];
+const { heroes, loading, error, searchByName, validationErrors } = useSuperHero();
+const nameSearch = ref<string | null>(null);
+
+const submitSearch = handleSubmit(async (values) => {
+    if (!values.search.trim()) return
+    nameSearch.value = values.search
+    await searchByName(values.search)
+});
 
 </script>
 
@@ -38,20 +43,22 @@ let heroes: SuperHero[] = [];
             <form id="form-super-hero-search" @submit="submitSearch">
                 <FieldGroup class="flex flex-col sm:flex-row gap-4 w-full">
                     <VeeField v-slot="{ field, errors }" name="search">
-                        <Field :data-invalid="!!errors.length" orientation="horizontal" class="w-full">
+                        <Field :data-invalid="!!errors.length || validationErrors.search?.length" orientation="horizontal" class="w-full">
                             <Input
                                 id="super-hero-search-name"
                                 v-bind="field"
                                 placeholder="Type the super hero name"
                                 autocomplete="off"
                                 :aria-invalid="!!errors.length"
+                                :disabled="loading"
                             />
-                            <FieldError v-if="errors.length" :errors="errors" />
+                            <FieldError v-if="errors.length || validationErrors.search?.length" :errors="validationErrors.search?.concat(errors)" />
                         </Field>
                     </VeeField>
                     <Field orientation="horizontal">
-                        <Button variant="secondary" class="flex items-center gap-2">
-                            <Search class="size-4"/>
+                        <Button type="submit" class="flex items-center gap-2" :disabled="loading">
+                            <Loader2 v-if="loading" class="size-4 animate-spin" />
+                            <Search v-else class="size-4"/>
                             Search
                         </Button>
                     </Field>
@@ -59,12 +66,13 @@ let heroes: SuperHero[] = [];
             </form>
         </CardContent>
     </Card>
-    <Card v-if="nameSearch" class="w-full mt-4">
+    <Card v-if="nameSearch && !validationErrors.search?.length" class="w-full mt-4">
         <CardHeader>
-            <CardTitle>Search results for: <strong>{{ nameSearch }}</strong></CardTitle>
+            <CardTitle class="font-medium text-xl">Search results for: <strong>{{ nameSearch }}</strong></CardTitle>
         </CardHeader>
         <CardContent>
-            <SuperHeroList :super-heroes="heroes" />
+            <SuperHeroListSkeleton v-if="loading" :rows="5" />
+            <SuperHeroList v-else :super-heroes="heroes" />
         </CardContent>
     </Card>
 </template>

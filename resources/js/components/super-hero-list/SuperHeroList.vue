@@ -10,7 +10,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <ul role="list" class="divide-y divide-y-white my-6">
+    <ul role="list" class="divide-y divide-y-white">
         <template v-if="props.superHeroes.length">
             <SuperHeroItem
                 v-for="hero in props.superHeroes"
