@@ -13,17 +13,17 @@ class SuperHeroController extends Controller
 
     /**
      * @param Request $request
-     * @return View
+     * @return JsonResponse
      *
      * Return the retrieved Super Heroes matching a name query
      */
-    public function index(SuperHeroSearchFormRequest $request): View
+    public function index(SuperHeroSearchFormRequest $request): JsonResponse
     {
         $superHeroes = null;
         if($request->filled('search')){
             $superHeroes = SuperHeroService::search($request->input('search'));
         }
-        return view('super-heroes.index',compact('superHeroes'));
+        return response()->json($superHeroes);
     }
 
     /**
