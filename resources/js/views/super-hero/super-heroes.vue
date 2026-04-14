@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import {useForm,Field as VeeField} from "vee-validate";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
+import {Field,FieldError, FieldGroup} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import SuperHeroList from "@/components/super-hero-list/SuperHeroList.vue";
 import {Search, Loader2} from "lucide-vue-next";
-import type {SuperHero} from "@/types";
 import {ref} from "vue";
 import {useSuperHero} from "@/composables/useSuperHero";
 import SuperHeroListSkeleton from "@/components/super-hero-list/SuperHeroListSkeleton.vue";
@@ -42,8 +41,8 @@ const submitSearch = handleSubmit(async (values) => {
         <CardContent>
             <form id="form-super-hero-search" @submit="submitSearch">
                 <FieldGroup class="flex flex-col sm:flex-row gap-4 w-full">
-                    <VeeField v-slot="{ field, errors }" name="search">
-                        <Field :data-invalid="!!errors.length || validationErrors.search?.length" orientation="horizontal" class="w-full">
+                    <VeeField v-slot="{ field, errors }" name="search" class="w-full">
+                        <Field :data-invalid="!!errors.length || validationErrors.search?.length" class="w-full">
                             <Input
                                 id="super-hero-search-name"
                                 v-bind="field"
@@ -55,13 +54,11 @@ const submitSearch = handleSubmit(async (values) => {
                             <FieldError v-if="errors.length || validationErrors.search?.length" :errors="validationErrors.search?.concat(errors)" />
                         </Field>
                     </VeeField>
-                    <Field orientation="horizontal">
-                        <Button type="submit" class="flex items-center gap-2" :disabled="loading">
-                            <Loader2 v-if="loading" class="size-4 animate-spin" />
-                            <Search v-else class="size-4"/>
-                            Search
-                        </Button>
-                    </Field>
+                    <Button type="submit" class="flex items-center gap-2" :disabled="loading">
+                        <Loader2 v-if="loading" class="size-4 animate-spin" />
+                        <Search v-else class="size-4"/>
+                        Search
+                    </Button>
                 </FieldGroup>
             </form>
         </CardContent>

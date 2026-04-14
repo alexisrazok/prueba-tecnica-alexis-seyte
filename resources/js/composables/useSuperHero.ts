@@ -3,10 +3,10 @@ import api from '@/api/index'
 import type {ApiValidationError, SuperHero} from '@/types'
 import {isAxiosError} from "axios";
 
+const hero = ref<SuperHero | null>(null);
+const heroes = ref<SuperHero[]>([]);
+const loading = ref(false);
 export function useSuperHero() {
-    const heroes = ref<SuperHero[]>([]);
-    const hero = ref<SuperHero | null>(null);
-    const loading = ref(false);
     const error = ref<string | null>(null);
     const validationErrors = ref<Record<string, string[]>>({});
 

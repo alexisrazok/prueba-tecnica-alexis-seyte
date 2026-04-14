@@ -4,7 +4,7 @@ import SuperHeroProfile from '@/views/super-hero/super-hero-profile.vue';
 
 const routes = [
     { path: '/', name:"super-hero.index",component: SuperHeroes },
-    { path: '/super-hero/:id', name: 'super-hero.show', component: SuperHeroProfile },
+    { path: '/super-hero-profile/:id', name: 'super-hero.show', component: SuperHeroProfile },
 ];
 
 export default createRouter({
