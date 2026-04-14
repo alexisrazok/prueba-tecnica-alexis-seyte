@@ -6,7 +6,7 @@ import {Skeleton} from '@/components/ui/skeleton'
 import {Badge} from '@/components/ui/badge'
 import {Separator} from '@/components/ui/separator'
 import {Progress} from '@/components/ui/progress'
-import {BookOpen, Brain, Briefcase, Flame, Shield, Swords, User, Users, Wind, Zap} from 'lucide-vue-next'
+import {BookOpen, Brain, Briefcase, Flame, Shield, Swords, User, Users, Wind, Zap, SearchX} from 'lucide-vue-next'
 import SuperHeroProfileHeader from "@/components/super-hero-profile/SuperHeroProfileHeader.vue";
 import SuperHeroProfileAvatar from "@/components/super-hero-profile/SuperHeroProfileAvatar.vue";
 import SuperHeroProfileSection from "@/components/super-hero-profile/SuperHeroProfileSection.vue";
@@ -41,7 +41,11 @@ const progressVariant = (statValue: number) => {
 </script>
 
 <template>
-    <div class="pb-16">
+    <div v-if="!loading && !hero" class="flex flex-col gap-5 w-full items-center justify-center h-full min-h-dvh">
+        <SearchX class="size-28" />
+        <h1 class="text-4xl">Super Hero Not Found</h1>
+    </div>
+    <div v-else class="pb-16">
         <SuperHeroProfileHeader/>
         <div class="relative px-4 sm:px-8 -mt-20">
             <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4">
