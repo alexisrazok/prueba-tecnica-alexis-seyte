@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Interfaces\SuperHeroInterface;
 use App\Models\SuperHero;
 use GuzzleHttp\Client;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class SuperHeroService implements SuperHeroInterface
 {
@@ -19,20 +21,11 @@ class SuperHeroService implements SuperHeroInterface
      */
     public static function findById(int $id): ?SuperHero
     {
-        $baseUrl = self::API_URL . config('services.superhero.key');
-        $fetchUrl = "{$baseUrl}/{$id}";
         try {
-            $client = new Client();
-            $request = $client->get($fetchUrl);
-            if ($request->getStatusCode() !== 200) {
-                throw new \Exception("Error requesting data from API");
-            }
-            $response = $request->getBody();
-            $responseContent = $response->getContents();
-            $responseJson = json_decode($responseContent);
+            $responseJson = self::getDataFromEndpoint("{$id}");
             return SuperHero::parse($responseJson);
         } catch (\Exception $exception) {
-            \Log::error('Superhero API error: ' . $exception->getMessage());
+            Log::error('Superhero API error: ' . $exception->getMessage());
             return null;
         }
     }
@@ -46,20 +39,38 @@ class SuperHeroService implements SuperHeroInterface
 
     public static function search(string $name): Collection
     {
-        $baseUrl = self::API_URL . config('services.superhero.key');
-        $fetchUrl = "{$baseUrl}/search/{$name}";
         try {
+            $responseJson = self::getDataFromEndpoint("search/{$name}");
+            return SuperHero::parse($responseJson->results);
+        } catch (\Exception $exception) {
+            Log::error('Superhero API error: ' . $exception->getMessage());
+            return collect([]);
+        }
+    }
+
+    /**
+     * @param string $endpoint
+     * @return array|object|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * Retrieve the requested data from an endpoint
+     */
+
+    private static function getDataFromEndpoint(string $endpoint): null|array|object
+    {
+        try {
+            $token = config('services.superhero.key');
+            $endpointUrl = self::API_URL . "{$token}/{$endpoint}";
             $client = new Client();
-            $request = $client->get($fetchUrl);
+            $request = $client->get($endpointUrl);
             if ($request->getStatusCode() !== 200) {
                 throw new \Exception("Error requesting data from API");
             }
             $response = $request->getBody();
             $responseContent = $response->getContents();
-            $responseJson = json_decode($responseContent);
-            return SuperHero::parse($responseJson->results);
+            return json_decode($responseContent);
         } catch (\Exception $exception) {
-            \Log::error('Superhero API error: ' . $exception->getMessage());
+            Log::error('Superhero API Request error: ' . $exception->getMessage());
             return collect([]);
         }
     }
