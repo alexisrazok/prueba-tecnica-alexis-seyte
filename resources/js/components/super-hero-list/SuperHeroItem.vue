@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <li v-if="props.superHero" class="flex p-4 text-primary">
+    <li v-if="props.superHero" class="flex p-4 text-primary hover:bg-primary/30">
         <RouterLink
             :to="{ name: 'super-hero.show', params: { id: props.superHero.id } }"
             class="flex flex-row gap-3 items-center justify-between w-full"

@@ -50,6 +50,7 @@ const submitSearch = handleSubmit(async (values) => {
                                 autocomplete="off"
                                 :aria-invalid="!!errors.length"
                                 :disabled="loading"
+                                required
                             />
                             <FieldError v-if="errors.length || validationErrors.search?.length" :errors="validationErrors.search?.concat(errors)" />
                         </Field>
