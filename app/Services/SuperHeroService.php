@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Interfaces\SuperHeroInterface;
 use App\Models\SuperHero;
 use GuzzleHttp\Client;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -23,7 +22,7 @@ class SuperHeroService implements SuperHeroInterface
     {
         try {
             $responseJson = self::getDataFromEndpoint("{$id}");
-            if(!$responseJson){
+            if (!$responseJson) {
                 return null;
             }
             return SuperHero::parse($responseJson);
@@ -44,7 +43,7 @@ class SuperHeroService implements SuperHeroInterface
     {
         try {
             $responseJson = self::getDataFromEndpoint("search/{$name}");
-            if(!$responseJson || !isset($responseJson->results)){
+            if (!$responseJson || !isset($responseJson->results)) {
                 return collect([]);
             }
             return SuperHero::parse($responseJson->results);
