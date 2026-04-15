@@ -45,7 +45,6 @@ export function useSuperHero() {
             }else{
                 hero.value = data
             }
-            console.log("HERO",hero.value);
         } catch (e) {
             if (isAxiosError(e) && e.response?.status === 404) {
                 error.value = 'Hero not found'
