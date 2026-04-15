@@ -1,11 +1,11 @@
 import { ref } from 'vue'
 import api from '@/api/index'
-import type {ApiValidationError, SearchResult, SuperHero} from '@/types'
+import type {ApiValidationError, HeroResponse, SearchResult, SuperHero} from '@/types'
 import {isAxiosError} from "axios";
 const hero = ref<SuperHero | null>(null);
 const heroes = ref<SuperHero[]>([]);
+const loading = ref(false);
 export function useSuperHero() {
-    const loading = ref(false);
     const error = ref<string | null>(null);
     const validationErrors = ref<Record<string, string[]>>({});
 
@@ -37,11 +37,11 @@ export function useSuperHero() {
         hero.value = null
 
         try {
-            const { data } = await api.get<SuperHero>(`/super-hero/${id}`)
-            if(Object.keys(data).length === 0){
+            const { data } = await api.get<HeroResponse>(`/super-hero/${id}`)
+            if(data.error){
                 error.value = 'Hero not found'
             }else{
-                hero.value = data
+                hero.value = data.superHero
             }
         } catch (e) {
             if (isAxiosError(e) && e.response?.status === 404) {

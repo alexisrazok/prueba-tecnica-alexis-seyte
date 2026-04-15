@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\SuperHeroRepositoryInterface;
 use App\Contracts\SuperHeroServiceInterface;
+use App\Models\HeroResult;
 use App\Models\SearchResult;
 use App\Models\SuperHero;
 
@@ -21,13 +22,14 @@ class SuperHeroService implements SuperHeroServiceInterface
      *
      * Get a Super Hero by existing SuperHero ID
      */
-    public function findById(int $id): SuperHero
+    public function findById(int $id): HeroResult
     {
-        $superHero = $this->repository->findById($id);
-        if (!$superHero) {
-            throw new \Exception("SuperHero Not Found");
+        $result = $this->repository->findById($id);
+        if ($result['response'] === 'error') {
+            return new HeroResult(response: 'error', superHero:null, error: $result['error']);
         }
-        return $superHero;
+        $superHero = SuperHero::parse(json_decode(json_encode($result)));
+        return new HeroResult(response:'true',superHero: $superHero);
     }
 
     /**

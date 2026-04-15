@@ -3,8 +3,6 @@
 namespace App\Repositories;
 
 use App\Contracts\SuperHeroRepositoryInterface;
-use App\Models\SuperHero;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -19,36 +17,36 @@ class SuperHeroRepository implements SuperHeroRepositoryInterface
     public function __construct()
     {
         $token = config('services.superhero.key');
-        $this->baseUrl = self::API_URL."{$token}";
+        $this->baseUrl = self::API_URL . "{$token}";
     }
 
-    public function findById(int $id): ?SuperHero
+    public function findById(int $id): ?array
     {
         $response = $this->requestFromApi("/{$id}");
-        if(!$response){
+        if (!$response) {
             return null;
         }
-        return Superhero::parse($response);
+        return $response;
     }
 
     public function searchByName(string $name): array
     {
         $response = $this->requestFromApi("/search/{$name}");
-        if(!$response){
+        if (!$response) {
             return [];
         }
         return $response;
     }
 
-    private function requestFromApi(string $endpoint): null|object|array
+    private function requestFromApi(string $endpoint): ?array
     {
         try {
             $response = Http::get("{$this->baseUrl}{$endpoint}");
             if ($response->failed()) {
-                throw new \Exception('Error fetching data from SuperHeroApi:'.$endpoint);
+                throw new \Exception('Error fetching data from SuperHeroApi:' . $endpoint);
             }
             return $response->json();
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             Log::error("SuperHeroRepository error: {$exception->getMessage()}");
             return null;
         }

@@ -53,6 +53,11 @@ export interface SearchResult {
     superHeroes: SuperHero[]
     error?: string
 }
+export interface HeroResponse {
+    response: 'success' | 'error'
+    superHero: SuperHero
+    error?: string
+}
 export interface ApiValidationError {
     message: string
     errors: Record<string, string[]>
