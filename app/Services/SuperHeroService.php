@@ -23,6 +23,9 @@ class SuperHeroService implements SuperHeroInterface
     {
         try {
             $responseJson = self::getDataFromEndpoint("{$id}");
+            if(!$responseJson){
+                return null;
+            }
             return SuperHero::parse($responseJson);
         } catch (\Exception $exception) {
             Log::error('Superhero API error: ' . $exception->getMessage());
@@ -41,6 +44,9 @@ class SuperHeroService implements SuperHeroInterface
     {
         try {
             $responseJson = self::getDataFromEndpoint("search/{$name}");
+            if(!$responseJson || !isset($responseJson->results)){
+                return collect([]);
+            }
             return SuperHero::parse($responseJson->results);
         } catch (\Exception $exception) {
             Log::error('Superhero API error: ' . $exception->getMessage());
@@ -71,7 +77,7 @@ class SuperHeroService implements SuperHeroInterface
             return json_decode($responseContent);
         } catch (\Exception $exception) {
             Log::error('Superhero API Request error: ' . $exception->getMessage());
-            return collect([]);
+            return null;
         }
     }
 }
