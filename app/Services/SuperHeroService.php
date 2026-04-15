@@ -2,15 +2,18 @@
 
 namespace App\Services;
 
-use App\Interfaces\SuperHeroInterface;
+use App\Contracts\SuperHeroRepositoryInterface;
+use App\Contracts\SuperHeroServiceInterface;
+use App\Models\SearchResult;
 use App\Models\SuperHero;
-use GuzzleHttp\Client;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
-class SuperHeroService implements SuperHeroInterface
+class SuperHeroService implements SuperHeroServiceInterface
 {
-    private const API_URL = "https://superheroapi.com/api/";
+    public function __construct(
+        private SuperheroRepositoryInterface $repository
+    )
+    {
+    }
 
     /**
      * @param int $id
@@ -18,65 +21,33 @@ class SuperHeroService implements SuperHeroInterface
      *
      * Get a Super Hero by existing SuperHero ID
      */
-    public static function findById(int $id): ?SuperHero
+    public function findById(int $id): SuperHero
     {
-        try {
-            $responseJson = self::getDataFromEndpoint("{$id}");
-            if (!$responseJson) {
-                return null;
-            }
-            return SuperHero::parse($responseJson);
-        } catch (\Exception $exception) {
-            Log::error('Superhero API error: ' . $exception->getMessage());
-            return null;
+        $superHero = $this->repository->findById($id);
+        if (!$superHero) {
+            throw new \Exception("SuperHero Not Found");
         }
+        return $superHero;
     }
 
     /**
      * @param string $name
-     * @return Collection
+     * @return SearchResult
      *
-     * Get a Super Hero Collection matching with $name
+     * Get a Super Hero SearchResult matching with $name
      */
 
-    public static function search(string $name): Collection
+    public function search(string $name): SearchResult
     {
-        try {
-            $responseJson = self::getDataFromEndpoint("search/{$name}");
-            if (!$responseJson || !isset($responseJson->results)) {
-                return collect([]);
-            }
-            return SuperHero::parse($responseJson->results);
-        } catch (\Exception $exception) {
-            Log::error('Superhero API error: ' . $exception->getMessage());
-            return collect([]);
+        $result = $this->repository->searchByName($name);
+        if ($result['response'] === 'error') {
+            return new SearchResult(response: 'error', error: $result['error']);
         }
-    }
+        $superHeroes = array_map(
+            fn($hero) => Superhero::parse(json_decode(json_encode($hero))),
+            $result['results']
+        );
 
-    /**
-     * @param string $endpoint
-     * @return array|object|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     *
-     * Retrieve the requested data from an endpoint
-     */
-
-    private static function getDataFromEndpoint(string $endpoint): null|array|object
-    {
-        try {
-            $token = config('services.superhero.key');
-            $endpointUrl = self::API_URL . "{$token}/{$endpoint}";
-            $client = new Client();
-            $request = $client->get($endpointUrl);
-            if ($request->getStatusCode() !== 200) {
-                throw new \Exception("Error requesting data from API");
-            }
-            $response = $request->getBody();
-            $responseContent = $response->getContents();
-            return json_decode($responseContent);
-        } catch (\Exception $exception) {
-            Log::error('Superhero API Request error: ' . $exception->getMessage());
-            return null;
-        }
+        return new SearchResult(response: 'success', superHeroes: $superHeroes);
     }
 }

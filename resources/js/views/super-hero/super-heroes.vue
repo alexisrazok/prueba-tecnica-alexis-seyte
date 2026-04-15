@@ -1,36 +1,44 @@
 <script setup lang="ts">
-import {useForm,Field as VeeField} from "vee-validate";
+import {Field as VeeField, useForm} from "vee-validate";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Field,FieldError, FieldGroup} from "@/components/ui/field";
+import {Field, FieldError, FieldGroup} from "@/components/ui/field";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import SuperHeroList from "@/components/super-hero-list/SuperHeroList.vue";
-import {Search, Loader2} from "lucide-vue-next";
+import {AlertCircleIcon, Loader2, Search} from "lucide-vue-next";
 import {ref} from "vue";
 import {useSuperHero} from "@/composables/useSuperHero";
 import SuperHeroListSkeleton from "@/components/super-hero-list/SuperHeroListSkeleton.vue";
+import {Alert, AlertDescription, AlertTitle,} from '@/components/ui/alert'
 
 interface SearchForm {
     search: string;
 }
-const { handleSubmit } = useForm<SearchForm>({
+
+const {handleSubmit, resetForm} = useForm<SearchForm>({
     initialValues: {
         search: '',
     }
 });
 
-const { heroes, loading, error, searchByName, validationErrors } = useSuperHero();
+const {heroes, loading, error, searchByName, validationErrors} = useSuperHero();
 const nameSearch = ref<string | null>(null);
 
 const submitSearch = handleSubmit(async (values) => {
     if (!values.search.trim()) return
     nameSearch.value = values.search
     await searchByName(values.search)
+    resetForm()
 });
 
 </script>
 
 <template>
+    <Alert v-if="error" variant="destructive" class="my-2">
+        <AlertCircleIcon/>
+        <AlertTitle>Error!</AlertTitle>
+        <AlertDescription>{{ error }}</AlertDescription>
+    </Alert>
     <Card class="w-full">
         <CardHeader>
             <CardTitle class="text-lg font-semibold">Search</CardTitle>
@@ -50,13 +58,13 @@ const submitSearch = handleSubmit(async (values) => {
                                 autocomplete="off"
                                 :aria-invalid="!!errors.length"
                                 :disabled="loading"
-                                required
                             />
-                            <FieldError v-if="errors.length || validationErrors.search?.length" :errors="validationErrors.search?.concat(errors)" />
+                            <FieldError v-if="errors.length || validationErrors.search?.length"
+                                        :errors="validationErrors.search?.concat(errors)"/>
                         </Field>
                     </VeeField>
                     <Button type="submit" class="flex items-center gap-2" :disabled="loading">
-                        <Loader2 v-if="loading" class="size-4 animate-spin" />
+                        <Loader2 v-if="loading" class="size-4 animate-spin"/>
                         <Search v-else class="size-4"/>
                         Search
                     </Button>
@@ -69,8 +77,8 @@ const submitSearch = handleSubmit(async (values) => {
             <CardTitle class="font-medium text-xl">Search results for: <strong>{{ nameSearch }}</strong></CardTitle>
         </CardHeader>
         <CardContent>
-            <SuperHeroListSkeleton v-if="loading" :rows="5" />
-            <SuperHeroList v-else :super-heroes="heroes" />
+            <SuperHeroListSkeleton v-if="loading" :rows="5"/>
+            <SuperHeroList v-else :super-heroes="heroes"/>
         </CardContent>
     </Card>
 </template>

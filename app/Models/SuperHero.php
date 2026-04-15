@@ -19,11 +19,8 @@ class SuperHero
     {
     }
 
-    public static function parse(array|object $data): self|Collection
+    public static function parse(object $data): self
     {
-        if (is_array($data)) {
-            return collect($data)->map(fn($item) => self::parse($item));
-        }
         return new self(
             id: $data->id,
             name: $data->name,

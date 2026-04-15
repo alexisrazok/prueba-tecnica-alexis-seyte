@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Biography extends Model
+class Biography
 {
     public function __construct(
         public readonly string $fullName,

@@ -1,12 +1,11 @@
 import { ref } from 'vue'
 import api from '@/api/index'
-import type {ApiValidationError, SuperHero} from '@/types'
+import type {ApiValidationError, SearchResult, SuperHero} from '@/types'
 import {isAxiosError} from "axios";
-
 const hero = ref<SuperHero | null>(null);
 const heroes = ref<SuperHero[]>([]);
-const loading = ref(false);
 export function useSuperHero() {
+    const loading = ref(false);
     const error = ref<string | null>(null);
     const validationErrors = ref<Record<string, string[]>>({});
 
@@ -16,14 +15,13 @@ export function useSuperHero() {
         heroes.value = [];
 
         try {
-            const { data } = await api.get<SuperHero[]>('super-hero', {
+            const { data } = await api.get<SearchResult>('super-hero', {
                 params: { search:name },
             })
-            heroes.value = data
+            heroes.value = data.superHeroes;
         } catch (e) {
             if (isAxiosError(e) && e.response?.status === 422) {
                 const validationData = e.response.data as ApiValidationError;
-                error.value = validationData.message
                 validationErrors.value = validationData.errors
             } else {
                 error.value = 'Error fetching heroes'

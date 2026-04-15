@@ -12,7 +12,7 @@ import SuperHeroProfileAvatar from "@/components/super-hero-profile/SuperHeroPro
 import SuperHeroProfileSection from "@/components/super-hero-profile/SuperHeroProfileSection.vue";
 
 const route = useRoute()
-const {hero, loading, getById} = useSuperHero()
+const {hero, loading, error, getById} = useSuperHero()
 
 onMounted(() => getById(route.params.id as string))
 
@@ -41,11 +41,11 @@ const progressVariant = (statValue: number) => {
 </script>
 
 <template>
-    <div v-if="!loading && !hero" class="flex flex-col gap-5 w-full items-center justify-center h-full min-h-dvh">
+    <div v-if="!loading && error" class="flex flex-col gap-5 w-full items-center justify-center h-full min-h-dvh">
         <SearchX class="size-28" />
         <h1 class="text-4xl">Super Hero Not Found</h1>
     </div>
-    <div v-else class="pb-16">
+    <div v-else-if="!loading && hero" class="pb-16">
         <SuperHeroProfileHeader/>
         <div class="relative px-4 sm:px-8 -mt-20">
             <div class="flex flex-col sm:flex-row items-start sm:items-end gap-4">
